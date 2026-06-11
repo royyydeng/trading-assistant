@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>交易助手</title>
+<style>
+  :root {
+    --bg:        #0d0f14;
+    --surface:   #161b24;
+    --card:      #1e2535;
+    --border:    #2a3347;
+    --muted:     #3d4f6e;
+    --text:      #e2e8f4;
+    --subtext:   #7b8fb5;
+    --accent:    #4a9eff;
+    --long:      #26d07c;
+    --long-dim:  #183d28;
+    --short:     #f04f5a;
+    --short-dim: #3a1418;
+    --loss:      #f04f5a;
+    --loss-bg:   #2d1017;
+    --even:      #f5a623;
+    --even-bg:   #2d2008;
+    --profit:    #26d07c;
+    --profit-bg: #0d2b1a;
+    --radius:    14px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    min-height: 100vh;
+    padding: 0 0 40px;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 14px;
+  }
+  header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    color: var(--text);
+  }
+  header .clock {
+    font-size: 13px;
+    color: var(--subtext);
+    font-variant-numeric: tabular-nums;
+    margin-left: auto;
+  }
+
+  /* ── Tab Nav ── */
+  .tab-nav {
+    display: flex;
+    gap: 0;
+    border-top: 1px solid var(--border);
+  }
+  .tab-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--subtext);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 0;
+    cursor: pointer;
+    border-bottom: 2.5px solid transparent;
+    transition: color .15s, border-color .15s;
+    letter-spacing: .3px;
+  }
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* ── Pages ── */
+  .page { display: none; }
+  .page.visible { display: block; }
+
+  /* ── Strategy grid ── */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 16px;
+  }
+  @media (min-width: 768px) {
+    .grid { grid-template-columns: 1fr 1fr 1fr; padding: 20px 24px; gap: 16px; }
+    header { padding: 20px 24px 0; }
+    header h1 { font-size: 22px; }
+  }
+
+  /* ── Strategy card ── */
+  .card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    cursor: pointer;
+    transition: border-color .18s, box-shadow .18s;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+  }
+  .card:active { transform: scale(.98); }
+  .card.active-long  { border-color: var(--long);  box-shadow: 0 0 0 1px var(--long);  }
+  .card.active-short { border-color: var(--short); box-shadow: 0 0 0 1px var(--short); }
+
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+  .strategy-name { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.3; word-break: break-all; }
+
+  .badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; margin-left: 6px; }
+  .badge-long  { background: var(--long-dim);  color: var(--long);  }
+  .badge-short { background: var(--short-dim); color: var(--short); }
+
+  .card-params { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 8px; margin-bottom: 10px; }
+  .param-item { font-size: 11px; color: var(--subtext); }
+  .param-val  { color: var(--text); font-weight: 500; }
+
+  .entry-row { display: none; align-items: center; gap: 6px; margin-top: 4px; }
+  .card.active-long .entry-row,
+  .card.active-short .entry-row { display: flex; }
+
+  .entry-label { font-size: 11px; color: var(--subtext); white-space: nowrap; }
+
+  .entry-input {
+    flex: 1;
+    background: var(--bg);
+    border: 1.5px solid var(--muted);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    padding: 7px 10px;
+    text-align: center;
+    outline: none;
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .entry-input:focus { border-color: var(--accent); }
+  .entry-input::placeholder { color: var(--muted); font-size: 14px; font-weight: 400; }
+
+  .clear-btn {
+    background: var(--muted);
+    border: none;
+    border-radius: 50%;
+    color: var(--surface);
+    width: 26px; height: 26px;
+    font-size: 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+  }
+
+  .result-area { display: none; flex-direction: column; gap: 5px; margin-top: 10px; }
+  .card.has-result .result-area { display: flex; }
+
+  .chip { display: flex; justify-content: space-between; align-items: center; border-radius: var(--radius-sm); padding: 8px 10px; font-size: 13px; }
+  .chip-label { font-weight: 500; font-size: 12px; }
+  .chip-val   { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .chip-loss   { background: var(--loss-bg);   color: var(--loss);   }
+  .chip-even   { background: var(--even-bg);   color: var(--even);   }
+  .chip-profit { background: var(--profit-bg); color: var(--profit); }
+
+  .hint { font-size: 11px; color: var(--muted); text-align: center; padding-top: 4px; }
+  .card.active-long .hint,
+  .card.active-short .hint { display: none; }
+
+  .section-title {
+    font-size: 11px; font-weight: 600; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--subtext); padding: 8px 16px 0;
+  }
+  @media (min-width: 768px) { .section-title { padding: 8px 24px 0; } }
+
+  /* ════════════════════════════════
+     參數表頁面
+  ════════════════════════════════ */
+  .params-page { padding: 16px; }
+  @media (min-width: 768px) { .params-page { padding: 20px 24px; } }
+
+  .params-title {
+    font-size: 13px; font-weight: 600; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--subtext);
+    margin-bottom: 12px;
+  }
+
+  .params-table-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  thead tr {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  thead th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    color: var(--subtext);
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background .12s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:active { background: var(--card); }
+
+  tbody td {
+    padding: 12px 14px;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .td-name { font-weight: 600; font-size: 13px; }
+  .td-num  { color: var(--text); font-weight: 500; }
+
+  .td-loss   { color: var(--loss);   font-weight: 600; }
+  .td-even   { color: var(--even);   font-weight: 600; }
+  .td-profit { color: var(--profit); font-weight: 600; }
+
+  .row-long  td:first-child { border-left: 3px solid var(--long);  }
+  .row-short td:first-child { border-left: 3px solid var(--short); }
+
+  .tbl-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <h1>📈 交易助手</h1>
+    <div class="clock" id="clock">--:--:--</div>
+  </div>
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('trade')">交易模式</button>
+    <button class="tab-btn"        onclick="switchTab('params')">策略參數表</button>
+  </div>
+</header>
+
+<div id="page-trade" class="page visible">
+  <div id="app"></div>
+</div>
+
+<div id="page-params" class="page">
+  <div class="params-page">
+    <div class="params-title">所有策略參數</div>
+    <div class="params-table-wrap">
+      <table id="params-table">
+        <thead>
+          <tr>
+            <th>策略名稱</th>
+            <th>方向</th>
+            <th>停損點</th>
+            <th>停利點</th>
+            <th>保本點</th>
+          </tr>
+        </thead>
+        <tbody id="params-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+//  策略資料庫
+// ════════════════════════════════════════
+const STRATEGIES = [
+  { id: 's1',   name: '(P)backtestS1',   dir: 'long',  breakEven: 20,  stopLoss: 100, takeProfit: 40  },
+  { id: 's20e', name: '(P)backtestS20E', dir: 'long',  breakEven: 15,  stopLoss: 100, takeProfit: 35  },
+  { id: 's3',   name: '(P)backtestS3',   dir: 'long',  breakEven: 10,  stopLoss: 100, takeProfit: 20  },
+  { id: 's5e',  name: '(P)backtestS5E',  dir: 'long',  breakEven: 30,  stopLoss: 200, takeProfit: 50  },
+  { id: 's6f',  name: '(P)backtestS6F',  dir: 'long',  breakEven: 25,  stopLoss: 100, takeProfit: 30  },
+  { id: 's9',   name: '(P)backtestS9',   dir: 'short', breakEven: 5,   stopLoss: 100, takeProfit: 100 },
+  { id: 's10',  name: '(P)backtestS10',  dir: 'long',  breakEven: 30,  stopLoss: 100, takeProfit: 100 },
+  { id: 's11',  name: '(P)backtestS11',  dir: 'short', breakEven: 20,  stopLoss: 150, takeProfit: 30  },
+  { id: 's12d', name: '(P)backtestS12D', dir: 'long',  breakEven: 30,  stopLoss: 150, takeProfit: 85  },
+  { id: 's17g', name: '(P)backtestS17G', dir: 'short', breakEven: 30,  stopLoss: 100, takeProfit: 35  },
+  { id: 's28d', name: '(P)backtestS28D', dir: 'long',  breakEven: 30,  stopLoss: 150, takeProfit: 90  },
+];
+
+// ════════════════════════════════════════
+//  Tab 切換
+// ════════════════════════════════════════
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    b.classList.toggle('active', (i === 0 && tab === 'trade') || (i === 1 && tab === 'params'));
+  });
+  document.getElementById('page-trade').classList.toggle('visible', tab === 'trade');
+  document.getElementById('page-params').classList.toggle('visible', tab === 'params');
+}
+
+// ════════════════════════════════════════
+//  計算邏輯
+// ════════════════════════════════════════
+function calcPrices(strategy, entry) {
+  const e = parseFloat(entry);
+  if (isNaN(e)) return null;
+  if (strategy.dir === 'long') {
+    return { loss: e - strategy.stopLoss, even: e + strategy.breakEven, profit: e + strategy.takeProfit };
+  } else {
+    return { loss: e + strategy.stopLoss, even: e - strategy.breakEven, profit: e - strategy.takeProfit };
+  }
+}
+
+// ════════════════════════════════════════
+//  交易模式渲染
+// ════════════════════════════════════════
+const state = {};
+STRATEGIES.forEach(s => { state[s.id] = { active: false, entry: '' }; });
+
+function render() {
+  const app = document.getElementById('app');
+  const longStrats  = STRATEGIES.filter(s => s.dir === 'long');
+  const shortStrats = STRATEGIES.filter(s => s.dir === 'short');
+  app.innerHTML = `
+    <div class="section-title">做多策略</div>
+    <div class="grid">${longStrats.map(cardHTML).join('')}</div>
+    <div class="section-title">做空策略</div>
+    <div class="grid">${shortStrats.map(cardHTML).join('')}</div>
+  `;
+  STRATEGIES.forEach(s => {
+    const card     = document.getElementById('card-' + s.id);
+    const input    = document.getElementById('input-' + s.id);
+    const clearBtn = document.getElementById('clear-' + s.id);
+    card.addEventListener('click', (e) => {
+      if (e.target === input || e.target === clearBtn) return;
+      state[s.id].active = !state[s.id].active;
+      if (!state[s.id].active) state[s.id].entry = '';
+      renderCard(s);
+      if (state[s.id].active) setTimeout(() => input && input.focus(), 50);
+    });
+    if (input) {
+      input.addEventListener('input', (e) => { state[s.id].entry = e.target.value; renderCard(s); });
+      input.addEventListener('click', e => e.stopPropagation());
+    }
+    if (clearBtn) {
+      clearBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        state[s.id].entry = '';
+        renderCard(s);
+        input && input.focus();
+      });
+    }
+  });
+}
+
+function cardHTML(s) {
+  const st = state[s.id];
+  const isLong = s.dir === 'long';
+  const active = st.active;
+  const prices = active ? calcPrices(s, st.entry) : null;
+  const activeClass = active ? (isLong ? 'active-long' : 'active-short') : '';
+  const resultClass = prices ? 'has-result' : '';
+  const dirLabel = isLong ? '做多' : '做空';
+  const entryLabel = isLong ? '買進點位' : '賣出點位';
+  return `
+  <div class="card ${activeClass} ${resultClass}" id="card-${s.id}">
+    <div class="card-top">
+      <div class="strategy-name">${s.name}</div>
+      <span class="badge ${isLong ? 'badge-long' : 'badge-short'}">${dirLabel}</span>
+    </div>
+    <div class="card-params">
+      <div class="param-item">停損 <span class="param-val">${s.stopLoss}</span></div>
+      <div class="param-item">停利 <span class="param-val">${s.takeProfit}</span></div>
+      <div class="param-item">保本 <span class="param-val">${s.breakEven}</span></div>
+    </div>
+    <div class="hint">點擊啟用</div>
+    <div class="entry-row">
+      <div class="entry-label">${entryLabel}</div>
+      <input class="entry-input" id="input-${s.id}" type="number" inputmode="decimal" placeholder="輸入點位" value="${st.entry}" />
+      <button class="clear-btn" id="clear-${s.id}" title="清除">✕</button>
+    </div>
+    <div class="result-area">
+      ${prices ? `
+      <div class="chip chip-loss"><span class="chip-label">⛔ 止損</span><span class="chip-val">${prices.loss}</span></div>
+      <div class="chip chip-even"><span class="chip-label">⚖️ 保本</span><span class="chip-val">${prices.even}</span></div>
+      <div class="chip chip-profit"><span class="chip-label">✅ 獲利</span><span class="chip-val">${prices.profit}</span></div>
+      ` : ''}
+    </div>
+  </div>`;
+}
+
+function renderCard(s) {
+  const card = document.getElementById('card-' + s.id);
+  const st = state[s.id];
+  const isLong = s.dir === 'long';
+  const prices = st.active ? calcPrices(s, st.entry) : null;
+  card.className = 'card' +
+    (st.active ? (isLong ? ' active-long' : ' active-short') : '') +
+    (prices ? ' has-result' : '');
+  const resultArea = card.querySelector('.result-area');
+  resultArea.innerHTML = prices ? `
+    <div class="chip chip-loss"><span class="chip-label">⛔ 止損</span><span class="chip-val">${prices.loss}</span></div>
+    <div class="chip chip-even"><span class="chip-label">⚖️ 保本</span><span class="chip-val">${prices.even}</span></div>
+    <div class="chip chip-profit"><span class="chip-label">✅ 獲利</span><span class="chip-val">${prices.profit}</span></div>` : '';
+  const input = document.getElementById('input-' + s.id);
+  if (input && input.value !== st.entry) input.value = st.entry;
+}
+
+// ════════════════════════════════════════
+//  參數表渲染
+// ════════════════════════════════════════
+function renderParamsTable() {
+  const tbody = document.getElementById('params-tbody');
+  tbody.innerHTML = STRATEGIES.map(s => {
+    const isLong = s.dir === 'long';
+    const dirLabel = isLong ? '做多' : '做空';
+    const badgeClass = isLong ? 'badge-long' : 'badge-short';
+    const rowClass = isLong ? 'row-long' : 'row-short';
+    return `
+    <tr class="${rowClass}">
+      <td class="td-name">${s.name}</td>
+      <td><span class="tbl-badge ${badgeClass}">${dirLabel}</span></td>
+      <td class="td-loss">${s.stopLoss}</td>
+      <td class="td-profit">${s.takeProfit}</td>
+      <td class="td-even">${s.breakEven}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════
+//  Clock
+// ════════════════════════════════════════
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    [now.getHours(), now.getMinutes(), now.getSeconds()]
+    .map(n => String(n).padStart(2,'0')).join(':');
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ════════════════════════════════════════
+//  Init
+// ════════════════════════════════════════
+render();
+renderParamsTable();
+</script>
+</body>
+</html>
