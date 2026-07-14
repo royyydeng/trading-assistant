@@ -38,7 +38,6 @@
     padding: 0 0 40px;
   }
 
-  /* ── Header ── */
   header {
     background: var(--surface);
     border-bottom: 1px solid var(--border);
@@ -66,12 +65,7 @@
     margin-left: auto;
   }
 
-  /* ── Tab Nav ── */
-  .tab-nav {
-    display: flex;
-    gap: 0;
-    border-top: 1px solid var(--border);
-  }
+  .tab-nav { display: flex; border-top: 1px solid var(--border); }
   .tab-btn {
     flex: 1;
     background: none;
@@ -85,16 +79,11 @@
     transition: color .15s, border-color .15s;
     letter-spacing: .3px;
   }
-  .tab-btn.active {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
-  }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-  /* ── Pages ── */
   .page { display: none; }
   .page.visible { display: block; }
 
-  /* ── Strategy grid ── */
   .grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -107,7 +96,6 @@
     header h1 { font-size: 22px; }
   }
 
-  /* ── Strategy card ── */
   .card {
     background: var(--card);
     border: 1.5px solid var(--border);
@@ -192,9 +180,7 @@
   }
   @media (min-width: 768px) { .section-title { padding: 8px 24px 0; } }
 
-  /* ════════════════════════════════
-     參數表頁面
-  ════════════════════════════════ */
+  /* 參數表 */
   .params-page { padding: 16px; }
   @media (min-width: 768px) { .params-page { padding: 20px 24px; } }
 
@@ -210,16 +196,9 @@
     border: 1px solid var(--border);
   }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
 
-  thead tr {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-  }
+  thead tr { background: var(--surface); border-bottom: 1px solid var(--border); }
   thead th {
     padding: 10px 14px;
     text-align: left;
@@ -231,23 +210,12 @@
     white-space: nowrap;
   }
 
-  tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background .12s;
-  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .12s; }
   tbody tr:last-child { border-bottom: none; }
   tbody tr:active { background: var(--card); }
+  tbody td { padding: 12px 14px; color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
-  tbody td {
-    padding: 12px 14px;
-    color: var(--text);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-  }
-
-  .td-name { font-weight: 600; font-size: 13px; }
-  .td-num  { color: var(--text); font-weight: 500; }
-
+  .td-name   { font-weight: 600; font-size: 13px; }
   .td-loss   { color: var(--loss);   font-weight: 600; }
   .td-even   { color: var(--even);   font-weight: 600; }
   .td-profit { color: var(--profit); font-weight: 600; }
@@ -296,26 +264,21 @@
 </div>
 
 <script>
-// ════════════════════════════════════════
-//  策略資料庫
-// ════════════════════════════════════════
 const STRATEGIES = [
-  { id: 's1',   name: '(P)backtestS1',   dir: 'long',  breakEven: 20,  stopLoss: 100, takeProfit: 40  },
-  { id: 's20e', name: '(P)backtestS20E', dir: 'long',  breakEven: 15,  stopLoss: 100, takeProfit: 35  },
-  { id: 's3',   name: '(P)backtestS3',   dir: 'long',  breakEven: 10,  stopLoss: 100, takeProfit: 20  },
-  { id: 's5e',  name: '(P)backtestS5E',  dir: 'long',  breakEven: 30,  stopLoss: 200, takeProfit: 50  },
-  { id: 's6f',  name: '(P)backtestS6F',  dir: 'long',  breakEven: 25,  stopLoss: 100, takeProfit: 30  },
-  { id: 's9',   name: '(P)backtestS9',   dir: 'short', breakEven: 5,   stopLoss: 100, takeProfit: 100 },
-  { id: 's10',  name: '(P)backtestS10',  dir: 'long',  breakEven: 30,  stopLoss: 100, takeProfit: 100 },
-  { id: 's11',  name: '(P)backtestS11',  dir: 'short', breakEven: 20,  stopLoss: 150, takeProfit: 30  },
-  { id: 's12d', name: '(P)backtestS12D', dir: 'long',  breakEven: 30,  stopLoss: 150, takeProfit: 85  },
-  { id: 's17g', name: '(P)backtestS17G', dir: 'short', breakEven: 30,  stopLoss: 100, takeProfit: 35  },
-  { id: 's28d', name: '(P)backtestS28D', dir: 'long',  breakEven: 30,  stopLoss: 150, takeProfit: 90  },
+  { id: 's1',   name: '(P)backtestS1',   dir: 'long',  breakEven: 20, stopLoss: 100, takeProfit: 40  },
+  { id: 's20e', name: '(P)backtestS20E', dir: 'long',  breakEven: 15, stopLoss: 100, takeProfit: 35  },
+  { id: 's3',   name: '(P)backtestS3',   dir: 'long',  breakEven: 10, stopLoss: 100, takeProfit: 20  },
+  { id: 's5e',  name: '(P)backtestS5E',  dir: 'long',  breakEven: 30, stopLoss: 200, takeProfit: 50  },
+  { id: 's6f',  name: '(P)backtestS6F',  dir: 'long',  breakEven: 25, stopLoss: 100, takeProfit: 30  },
+  { id: 's9',   name: '(P)backtestS9',   dir: 'short', breakEven: 5,  stopLoss: 100, takeProfit: 100 },
+  { id: 's10b', name: '(P)backtestS10B', dir: 'long',  breakEven: 25, stopLoss: 100, takeProfit: 75  },
+  { id: 's11',  name: '(P)backtestS11',  dir: 'short', breakEven: 20, stopLoss: 150, takeProfit: 30  },
+  { id: 's12d', name: '(P)backtestS12D', dir: 'long',  breakEven: 30, stopLoss: 150, takeProfit: 85  },
+  { id: 's17g', name: '(P)backtestS17G', dir: 'short', breakEven: 30, stopLoss: 100, takeProfit: 35  },
+  { id: 's28d', name: '(P)backtestS28D', dir: 'long',  breakEven: 30, stopLoss: 150, takeProfit: 90  },
+  { id: 's32f', name: '(P)backtestS32F', dir: 'short', breakEven: 30, stopLoss: 150, takeProfit: 95  },
 ];
 
-// ════════════════════════════════════════
-//  Tab 切換
-// ════════════════════════════════════════
 function switchTab(tab) {
   document.querySelectorAll('.tab-btn').forEach((b, i) => {
     b.classList.toggle('active', (i === 0 && tab === 'trade') || (i === 1 && tab === 'params'));
@@ -324,9 +287,6 @@ function switchTab(tab) {
   document.getElementById('page-params').classList.toggle('visible', tab === 'params');
 }
 
-// ════════════════════════════════════════
-//  計算邏輯
-// ════════════════════════════════════════
 function calcPrices(strategy, entry) {
   const e = parseFloat(entry);
   if (isNaN(e)) return null;
@@ -337,9 +297,6 @@ function calcPrices(strategy, entry) {
   }
 }
 
-// ════════════════════════════════════════
-//  交易模式渲染
-// ════════════════════════════════════════
 const state = {};
 STRATEGIES.forEach(s => { state[s.id] = { active: false, entry: '' }; });
 
@@ -382,17 +339,14 @@ function render() {
 function cardHTML(s) {
   const st = state[s.id];
   const isLong = s.dir === 'long';
-  const active = st.active;
-  const prices = active ? calcPrices(s, st.entry) : null;
-  const activeClass = active ? (isLong ? 'active-long' : 'active-short') : '';
-  const resultClass = prices ? 'has-result' : '';
-  const dirLabel = isLong ? '做多' : '做空';
+  const prices = st.active ? calcPrices(s, st.entry) : null;
+  const activeClass = st.active ? (isLong ? 'active-long' : 'active-short') : '';
   const entryLabel = isLong ? '買進點位' : '賣出點位';
   return `
-  <div class="card ${activeClass} ${resultClass}" id="card-${s.id}">
+  <div class="card ${activeClass}${prices ? ' has-result' : ''}" id="card-${s.id}">
     <div class="card-top">
       <div class="strategy-name">${s.name}</div>
-      <span class="badge ${isLong ? 'badge-long' : 'badge-short'}">${dirLabel}</span>
+      <span class="badge ${isLong ? 'badge-long' : 'badge-short'}">${isLong ? '做多' : '做空'}</span>
     </div>
     <div class="card-params">
       <div class="param-item">停損 <span class="param-val">${s.stopLoss}</span></div>
@@ -403,7 +357,7 @@ function cardHTML(s) {
     <div class="entry-row">
       <div class="entry-label">${entryLabel}</div>
       <input class="entry-input" id="input-${s.id}" type="number" inputmode="decimal" placeholder="輸入點位" value="${st.entry}" />
-      <button class="clear-btn" id="clear-${s.id}" title="清除">✕</button>
+      <button class="clear-btn" id="clear-${s.id}">✕</button>
     </div>
     <div class="result-area">
       ${prices ? `
@@ -423,8 +377,7 @@ function renderCard(s) {
   card.className = 'card' +
     (st.active ? (isLong ? ' active-long' : ' active-short') : '') +
     (prices ? ' has-result' : '');
-  const resultArea = card.querySelector('.result-area');
-  resultArea.innerHTML = prices ? `
+  card.querySelector('.result-area').innerHTML = prices ? `
     <div class="chip chip-loss"><span class="chip-label">⛔ 止損</span><span class="chip-val">${prices.loss}</span></div>
     <div class="chip chip-even"><span class="chip-label">⚖️ 保本</span><span class="chip-val">${prices.even}</span></div>
     <div class="chip chip-profit"><span class="chip-label">✅ 獲利</span><span class="chip-val">${prices.profit}</span></div>` : '';
@@ -432,20 +385,13 @@ function renderCard(s) {
   if (input && input.value !== st.entry) input.value = st.entry;
 }
 
-// ════════════════════════════════════════
-//  參數表渲染
-// ════════════════════════════════════════
 function renderParamsTable() {
-  const tbody = document.getElementById('params-tbody');
-  tbody.innerHTML = STRATEGIES.map(s => {
+  document.getElementById('params-tbody').innerHTML = STRATEGIES.map(s => {
     const isLong = s.dir === 'long';
-    const dirLabel = isLong ? '做多' : '做空';
-    const badgeClass = isLong ? 'badge-long' : 'badge-short';
-    const rowClass = isLong ? 'row-long' : 'row-short';
     return `
-    <tr class="${rowClass}">
+    <tr class="${isLong ? 'row-long' : 'row-short'}">
       <td class="td-name">${s.name}</td>
-      <td><span class="tbl-badge ${badgeClass}">${dirLabel}</span></td>
+      <td><span class="tbl-badge ${isLong ? 'badge-long' : 'badge-short'}">${isLong ? '做多' : '做空'}</span></td>
       <td class="td-loss">${s.stopLoss}</td>
       <td class="td-profit">${s.takeProfit}</td>
       <td class="td-even">${s.breakEven}</td>
@@ -453,21 +399,14 @@ function renderParamsTable() {
   }).join('');
 }
 
-// ════════════════════════════════════════
-//  Clock
-// ════════════════════════════════════════
 function updateClock() {
-  const now = new Date();
   document.getElementById('clock').textContent =
-    [now.getHours(), now.getMinutes(), now.getSeconds()]
+    [new Date().getHours(), new Date().getMinutes(), new Date().getSeconds()]
     .map(n => String(n).padStart(2,'0')).join(':');
 }
 setInterval(updateClock, 1000);
 updateClock();
 
-// ════════════════════════════════════════
-//  Init
-// ════════════════════════════════════════
 render();
 renderParamsTable();
 </script>
